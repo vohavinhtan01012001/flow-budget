@@ -53,7 +53,11 @@ export const ExpenseFilter: React.FC<IProps> = ({
           value={filter.categoryId}
         />
         <DatePicker.RangePicker
+          getPopupContainer={(trigger) =>
+            trigger.parentElement ?? document.body
+          }
           onChange={handleDateChange}
+          placeholder={['Từ ngày', 'Đến ngày']}
           style={{ flex: 1 }}
         />
       </div>

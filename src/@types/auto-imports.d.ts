@@ -35,6 +35,7 @@ declare global {
   const constants: typeof import('@/constants')['default']
   const convertToCamelCase: typeof import('../utils/shared.util')['convertToCamelCase']
   const convertToSnakeCase: typeof import('../utils/shared.util')['convertToSnakeCase']
+  const convertVietnameseNumbers: typeof import('../utils/vietnamese-number.util')['convertVietnameseNumbers']
   const createRef: typeof import('react')['createRef']
   const del: typeof import('../utils/api.util')['del']
   const exportToCSV: typeof import('../utils/export.util')['exportToCSV']

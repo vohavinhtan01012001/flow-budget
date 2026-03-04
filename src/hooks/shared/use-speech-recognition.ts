@@ -2,6 +2,8 @@ import { message } from 'antd';
 
 import { useAudioRecorder } from '@/hooks/shared/use-audio-recorder';
 import { supabase } from '@/libs/supabase/client';
+import { convertVietnameseNumbers } from '@/utils/vietnamese-number.util';
+import { EToast } from '@/models/enums/shared.enum';
 
 interface ISpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -113,7 +115,7 @@ export const useSpeechRecognition = (): ISpeechRecognitionHook => {
   // Show recorder errors as toast
   useEffect(() => {
     if (recorderError) {
-      message.error(recorderError);
+      showToast(recorderError, EToast.Error);
     }
   }, [recorderError]);
 
@@ -134,12 +136,12 @@ export const useSpeechRecognition = (): ISpeechRecognitionHook => {
     setIsTranscribing(true);
     try {
       const text = await sendToCloud(blob);
-      if (text) setTranscript(text);
+      if (text) setTranscript(convertVietnameseNumbers(text));
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : 'Unknown error';
       console.error('[speech] cloud transcription failed:', msg);
-      message.error(`Không thể nhận dạng giọng nói: ${msg}`);
+      showToast(`Không thể nhận dạng giọng nói: ${msg}`, EToast.Error);
     } finally {
       setIsTranscribing(false);
     }
@@ -168,7 +170,7 @@ export const useSpeechRecognition = (): ISpeechRecognitionHook => {
           }
         }
         if (finalTranscript) {
-          setTranscript(finalTranscript);
+          setTranscript(convertVietnameseNumbers(finalTranscript));
         }
       };
 
@@ -184,8 +186,9 @@ export const useSpeechRecognition = (): ISpeechRecognitionHook => {
       if (hasMediaRecorder) {
         startCloud();
       } else {
-        message.error(
+        showToast(
           'Trình duyệt không hỗ trợ nhận dạng giọng nói',
+          EToast.Error,
         );
       }
     }

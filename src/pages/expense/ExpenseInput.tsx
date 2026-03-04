@@ -16,6 +16,8 @@ import { useCategoryStore } from '@/stores/category.store';
 import { useExpenseStore } from '@/stores/expense.store';
 import { useSyncStore } from '@/stores/sync.store';
 import { parseExpenseInput, resolveCategory } from '@/utils/expense-parser.util';
+import { toast } from '@/components/shared/Toast';
+import { EToast } from '@/models/enums/shared.enum';
 
 export const ExpenseInput: React.FC = () => {
   const userInfo = useAuthStore((s) => s.userInfo);
@@ -96,7 +98,7 @@ export const ExpenseInput: React.FC = () => {
     setSelectedCategory(null);
 
     if (navigator.vibrate) navigator.vibrate(50);
-    message.success('Đã thêm chi tiêu!');
+    showToast('Đã thêm chi tiêu!');
     await refreshPendingCount();
     await checkBudgets();
   };

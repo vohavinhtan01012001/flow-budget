@@ -99,6 +99,7 @@
     "resolveCategory": true,
     "useBudgetAlert": true,
     "useSpeechRecognition": true,
-    "useAudioRecorder": true
+    "useAudioRecorder": true,
+    "convertVietnameseNumbers": true
   }
 }

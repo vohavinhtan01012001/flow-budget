@@ -140,7 +140,7 @@ const ToastContainer: React.FC = () => {
         padding: '0 16px',
         pointerEvents: 'none',
         position: 'fixed',
-        top: 16,
+        top: 'calc(16px + env(safe-area-inset-top, 0px))',
         transform: 'translateX(-50%)',
         width: '100%',
         zIndex: 9999,
