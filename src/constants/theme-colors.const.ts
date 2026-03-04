@@ -1,23 +1,25 @@
+// Tailwind CSS-inspired palette (sky + slate)
+
 export const DARK = {
-  BACKGROUND_CONTAINER: '#111c2d',
-  BACKGROUND_ELEVATED: '#1d1e1f',
-  BORDER: '#4c4d4f',
-  ICON_SVG: '#fff',
-  TEXT: '#fff',
-  TEXT_PLACEHOLDER: 'rgba(255, 255, 255, 0.5)',
+  BACKGROUND_CONTAINER: '#1e293b', // slate-800
+  BACKGROUND_ELEVATED: '#334155', // slate-700
+  BORDER: '#334155', // slate-700
+  ICON_SVG: '#f8fafc', // slate-50
+  TEXT: '#f8fafc', // slate-50
+  TEXT_PLACEHOLDER: 'rgba(148, 163, 184, 0.6)', // slate-400
 } as const;
 
 export const DEFAULT = {
-  BLACK: '#000',
-  PRIMARY: '#01c0c8',
-  WHITE: '#fff',
+  BLACK: '#030612',
+  PRIMARY: '#0ea5e9', // sky-500
+  WHITE: '#ffffff',
 } as const;
 
 export const LIGHT = {
-  BACKGROUND_CONTAINER: '#fff',
-  BACKGROUND_ELEVATED: '#fff',
-  BORDER: '#dcdfe6',
-  ICON_SVG: '#000',
-  TEXT: '#000',
-  TEXT_PLACEHOLDER: 'rgba(0,0,0,0.25)',
+  BACKGROUND_CONTAINER: '#ffffff',
+  BACKGROUND_ELEVATED: '#ffffff',
+  BORDER: '#e2e8f0', // slate-200
+  ICON_SVG: '#030612',
+  TEXT: '#030612',
+  TEXT_PLACEHOLDER: 'rgba(100, 116, 139, 0.5)', // slate-500
 } as const;

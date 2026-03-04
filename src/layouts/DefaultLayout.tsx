@@ -1,9 +1,10 @@
+import { Layout } from 'antd';
+import { Outlet } from 'react-router';
+
 import styles from '@/assets/styles/components/shared/default-layout.module.scss';
 import { TheSidebar } from '@/components/shared/TheSidebar';
 import { TheTopbar } from '@/components/shared/TheTopbar';
 import { useWindowScroll } from '@/hooks/shared/use-window-scroll';
-import { Layout } from 'antd';
-import { Outlet } from 'react-router';
 
 export const DefaultLayout: React.FC = () => {
   const { y } = useWindowScroll();

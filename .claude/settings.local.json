@@ -4,7 +4,17 @@
       "Bash(pnpm add:*)",
       "Bash(pnpm install:*)",
       "Bash(rm:*)",
-      "Bash(CI=true pnpm add:*)"
+      "Bash(CI=true pnpm add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(CI=true pnpm install:*)",
+      "Bash(python3:*)",
+      "Bash(pnpm type-check:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(pnpm build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

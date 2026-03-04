@@ -84,6 +84,21 @@
     "setLocalStorage": true,
     "CODEBASE": true,
     "COOKIE_KEYS": true,
-    "usePagination": true
+    "usePagination": true,
+    "AMOUNT_SUFFIXES": true,
+    "DEFAULT_KEYWORD_MAPPINGS": true,
+    "EXPENSE_PAGES": true,
+    "EXPENSE_TABS": true,
+    "PRESET_CATEGORIES": true,
+    "exportToCSV": true,
+    "exportToPDF": true,
+    "findCategoryKeyword": true,
+    "formatAmountShort": true,
+    "formatVND": true,
+    "parseExpenseInput": true,
+    "resolveCategory": true,
+    "useBudgetAlert": true,
+    "useSpeechRecognition": true,
+    "useAudioRecorder": true
   }
 }

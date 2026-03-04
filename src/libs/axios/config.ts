@@ -1,10 +1,11 @@
+import axios, { AxiosError, AxiosResponse, HttpStatusCode } from 'axios';
+import { stringify } from 'qs';
+import store2 from 'store2';
+
 import { STORAGE_KEYS } from '@/constants/shared.const';
 import { handleUnauthorizedError } from '@/libs/axios/util';
 import { TFailureResponse, TSuccessResponse } from '@/models/types/auth.type';
 import { convertToCamelCase, convertToSnakeCase } from '@/utils/shared.util';
-import axios, { AxiosError, AxiosResponse, HttpStatusCode } from 'axios';
-import { stringify } from 'qs';
-import store2 from 'store2';
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',

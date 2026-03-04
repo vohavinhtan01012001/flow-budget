@@ -1,6 +1,7 @@
-import { HOME } from '@/constants/route-pages.const';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router';
+
+import { HOME } from '@/constants/route-pages.const';
 
 export const TheBreadcrumb: React.FC = () => {
   const { t } = useTranslation();

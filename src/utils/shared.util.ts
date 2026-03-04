@@ -1,13 +1,13 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { stringify } from 'qs';
+import { create, StateCreator } from 'zustand';
+
+import { toast } from '@/components/shared/Toast';
 import { EResponseStatus } from '@/models/enums/auth.enum';
 import { EToast } from '@/models/enums/shared.enum';
 import { TFailureResponse } from '@/models/types/auth.type';
 import { TDate, TObjectUnknown } from '@/models/types/shared.type';
-import { notification } from 'antd';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import { capitalize } from 'lodash-es';
-import { stringify } from 'qs';
-import { create, StateCreator } from 'zustand';
 
 dayjs.extend(utc);
 
@@ -103,13 +103,9 @@ export const isFailureResponse = (
 export const showToast = (
   description: string,
   type = EToast.Success,
-  message: string = capitalize(type),
+  message?: string,
 ) => {
-  notification[type]({
-    description,
-    duration: 3,
-    message,
-  });
+  toast(description, type, message);
 };
 
 export const sleep = async (second: number) => {

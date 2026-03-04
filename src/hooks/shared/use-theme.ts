@@ -1,12 +1,13 @@
-import { STORAGE_KEYS } from '@/constants/shared.const';
 import { useLocalStorage } from 'usehooks-ts';
+
+import { STORAGE_KEYS } from '@/constants/shared.const';
 
 type TTheme = 'DARK' | 'LIGHT';
 
 export const useTheme = () => {
   const [isDark, setIsDark] = useLocalStorage<boolean>(
     STORAGE_KEYS.THEME,
-    false,
+    true,
   );
 
   const changeTheme = () => setIsDark((state) => !state);

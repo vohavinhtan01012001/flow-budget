@@ -1,3 +1,10 @@
+import {
+  AxiosError,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  isAxiosError,
+} from 'axios';
+
 import type { TLoadingTargets } from '@/models/types/shared.type';
 
 import { AUTH_PAGES } from '@/constants/route-pages.const';
@@ -7,13 +14,6 @@ import { TFailureResponse, TSuccessResponse } from '@/models/types/auth.type';
 import { useAuthStore } from '@/stores/auth.store';
 import { useLoadingStore } from '@/stores/loading.store';
 import { showToast } from '@/utils/shared.util';
-import {
-  AxiosError,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-  isAxiosError,
-} from 'axios';
-import store2 from 'store2';
 
 interface IAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -108,26 +108,11 @@ export const get = async <T = unknown, M = unknown>(
 export const handleUnauthorizedError = async (
   error: AxiosError<TFailureResponse>,
 ) => {
-  const isTokenRefreshed = await useAuthStore.getState().refreshToken();
+  useAuthStore.getState().logout();
+  window.location.href = AUTH_PAGES.LOGIN;
 
-  if (!isTokenRefreshed) {
-    useAuthStore.getState().logout();
-    window.location.href = AUTH_PAGES.LOGIN;
-    return;
-  }
-
-  const accessToken = store2.get(STORAGE_KEYS.ACCESS_TOKEN);
   const originalRequest = error.config as IAxiosRequestConfig;
-
-  if (originalRequest) {
-    if (!originalRequest.headers) originalRequest.headers = {};
-    originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
-    if (!originalRequest._retry) {
-      originalRequest._retry = true;
-      await axiosInstance(originalRequest);
-    }
-  }
+  void originalRequest;
 };
 
 export const patch = async <T = unknown, M = unknown>(

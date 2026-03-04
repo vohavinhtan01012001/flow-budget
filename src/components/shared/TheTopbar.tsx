@@ -1,28 +1,22 @@
-import IconDarkMode from '@/assets/icons/shared/IconDarkMode.svg?react';
-import IconEnglish from '@/assets/icons/shared/IconEnglish.svg?react';
-import IconJapanese from '@/assets/icons/shared/IconJapanese.svg?react';
-import IconLightMode from '@/assets/icons/shared/IconLightMode.svg?react';
-import IconNotification from '@/assets/icons/shared/IconNotification.svg?react';
-import IconVietnamese from '@/assets/icons/shared/IconVietnamese.svg?react';
+import { Avatar, Badge, MenuProps } from 'antd';
+import { Bell, Moon, Sun } from 'lucide-react';
+import { useNavigate } from 'react-router';
+
 import styles from '@/assets/styles/components/shared/the-topbar.module.scss';
 import { BaseDropdown } from '@/components/shared/BaseDropdown';
 import { TheBreadcrumb } from '@/components/shared/TheBreadcrumb';
 import { AUTH_PAGES } from '@/constants/route-pages.const';
 import { useLanguage } from '@/hooks/shared/use-language';
 import { useTheme } from '@/hooks/shared/use-theme';
-import { useThemeColor } from '@/hooks/shared/use-theme-color';
 import { notifications } from '@/mocks/the-topbar.mock';
 import { ELanguageCode } from '@/models/enums/shared.enum';
 import { useAuthStore } from '@/stores/auth.store';
-import { Avatar, Badge, MenuProps } from 'antd';
-import { useNavigate } from 'react-router';
 
 export const TheTopbar: React.FC = () => {
   const { changeTheme, isDark } = useTheme();
   const { language, setLanguage } = useLanguage();
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
-  const { getThemeColor } = useThemeColor();
 
   const i18nOptions = Object.entries(ELanguageCode).map(([key, value]) => ({
     label: key,
@@ -47,13 +41,10 @@ export const TheTopbar: React.FC = () => {
     ],
   };
 
-  const getIconPathForLanguage = (lang: ELanguageCode) => {
-    const iconPaths = {
-      [ELanguageCode.English]: <IconEnglish />,
-      [ELanguageCode.Japanese]: <IconJapanese />,
-      [ELanguageCode.Vietnamese]: <IconVietnamese />,
-    };
-    return iconPaths[lang];
+  const languageFlagMap: Record<ELanguageCode, string> = {
+    [ELanguageCode.English]: '🇺🇸',
+    [ELanguageCode.Japanese]: '🇯🇵',
+    [ELanguageCode.Vietnamese]: '🇻🇳',
   };
 
   const languageMenu: MenuProps = {
@@ -61,7 +52,7 @@ export const TheTopbar: React.FC = () => {
       key: item.value,
       label: (
         <div style={{ alignItems: 'center', display: 'flex', gap: '8px' }}>
-          {getIconPathForLanguage(item.value)}
+          <span>{languageFlagMap[item.value]}</span>
           <p>{item.label}</p>
         </div>
       ),
@@ -74,13 +65,6 @@ export const TheTopbar: React.FC = () => {
     await navigate(AUTH_PAGES.LOGIN);
   };
 
-  const renderIcon = () => {
-    const IconComponent = isDark ? IconLightMode : IconDarkMode;
-    return (
-      <IconComponent fill={getThemeColor('ICON_SVG')} onClick={changeTheme} />
-    );
-  };
-
   return (
     <div className={styles['container']}>
       <section className="tw-flex-center">
@@ -88,15 +72,17 @@ export const TheTopbar: React.FC = () => {
       </section>
 
       <section className={styles['container__menu']}>
-        {renderIcon()}
+        <span className="tw-cursor-pointer" onClick={changeTheme}>
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </span>
 
         <BaseDropdown menu={languageMenu}>
-          <span>{getIconPathForLanguage(language)}</span>
+          <span className="tw-cursor-pointer">{languageFlagMap[language]}</span>
         </BaseDropdown>
 
         <BaseDropdown menu={notificationMenu}>
           <Badge count={notifications.length}>
-            <IconNotification fill={getThemeColor('ICON_SVG')} />
+            <Bell className="tw-cursor-pointer" size={20} />
           </Badge>
         </BaseDropdown>
 

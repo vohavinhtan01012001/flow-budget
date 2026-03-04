@@ -1,6 +1,3 @@
-import { DEFAULT } from '@/constants/theme-colors.const';
-import { useTheme } from '@/hooks/shared/use-theme';
-import { useThemeColor } from '@/hooks/shared/use-theme-color';
 import {
   theme as antTheme,
   ConfigProvider,
@@ -9,6 +6,10 @@ import {
 } from 'antd';
 import { App as AntApp } from 'antd';
 import enUS from 'antd/locale/en_US';
+
+import { DEFAULT } from '@/constants/theme-colors.const';
+import { useTheme } from '@/hooks/shared/use-theme';
+import { useThemeColor } from '@/hooks/shared/use-theme-color';
 
 interface IProps {
   children: React.ReactNode;
@@ -25,13 +26,21 @@ export const AntConfigProvider: React.FC<IProps> = ({ children }) => {
     algorithm: isDark ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
     components: {
       Button: {
+        borderRadius: 12,
+        controlHeight: 44,
         primaryShadow: '',
+      },
+      Input: {
+        borderRadius: 14,
       },
       Layout: {
         headerHeight: '75px',
       },
       Menu: {
-        darkItemBg: '#111c2d',
+        darkItemBg: '#0f172a',
+      },
+      Modal: {
+        borderRadiusLG: 16,
       },
       Table: {
         borderColor: getThemeColor('BORDER'),
@@ -40,12 +49,14 @@ export const AntConfigProvider: React.FC<IProps> = ({ children }) => {
     cssVar: false,
     hashed: false,
     token: {
+      borderRadius: 12,
       colorBgContainer: getThemeColor('BACKGROUND_CONTAINER'),
       colorBgElevated: getThemeColor('BACKGROUND_ELEVATED'),
       colorBorder: getThemeColor('BORDER'),
       colorPrimary: DEFAULT.PRIMARY,
       colorText: getThemeColor('TEXT'),
       colorTextPlaceholder: getThemeColor('TEXT_PLACEHOLDER'),
+      fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
     },
   };
 

@@ -1,6 +1,7 @@
+import { useLocalStorage } from 'usehooks-ts';
+
 import { STORAGE_KEYS } from '@/constants/shared.const';
 import { ELanguageCode } from '@/models/enums/shared.enum';
-import { useLocalStorage } from 'usehooks-ts';
 
 export const useLanguage = () => {
   const { i18n } = useTranslation();

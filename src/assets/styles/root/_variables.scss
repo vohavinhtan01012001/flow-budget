@@ -11,7 +11,10 @@ $layout-margin: 20px;
 // scrollbars
 $scrollbar-width: 6px;
 
-// colors
+// colors — Tailwind CSS palette (sky + slate)
 $color-white: #fff;
-$color-black: #000;
-$color-primary: #01c0c8;
+$color-black: #030612;
+$color-primary: #0ea5e9; // sky-500
+$color-primary-hover: #0284c7; // sky-600
+$color-primary-light: #e0f2fe; // sky-100
+$color-primary-bg: rgba(14, 165, 233, 0.1);

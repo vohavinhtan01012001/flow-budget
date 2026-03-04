@@ -1,8 +1,9 @@
-import { ERole } from '@/models/enums/auth.enum';
-import { useAuthStore } from '@/stores/auth.store';
 import { Navigate, Route, RouteObject, Routes } from 'react-router';
 
-import { AUTH_PAGES, FORBIDDEN } from './constants/route-pages.const';
+import { ERole } from '@/models/enums/auth.enum';
+import { useAuthStore } from '@/stores/auth.store';
+
+import { AUTH_PAGES } from './constants/route-pages.const';
 
 type TModules = Record<string, { default: TRouteObject }>;
 
@@ -27,19 +28,16 @@ const ProtectedRoute: React.FC<{ route: TRouteObject }> = ({ route }) => {
         await initialize();
 
         const isAuthenticated = useAuthStore.getState().isAuthenticated;
-        const userRole = useAuthStore.getState().userInfo?.role;
 
         if (!isAuthenticated) {
           setElement(<Navigate replace to={AUTH_PAGES.LOGIN} />);
           return;
         }
 
+        // Skip role check for Supabase auth (no roles)
         const requiresRoles = route.meta.roles || [];
-        const hasRequiredRole = requiresRoles.some((role) => role === userRole);
-
-        if (requiresRoles.length && !hasRequiredRole) {
-          setElement(<Navigate replace to={FORBIDDEN} />);
-          return;
+        if (requiresRoles.length > 0) {
+          // With Supabase, treat all authenticated users as having access
         }
       }
       setElement(route.element);

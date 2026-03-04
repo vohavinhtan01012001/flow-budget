@@ -1,5 +1,6 @@
-import { useLoadingStore } from '@/stores/loading.store';
 import { Spin } from 'antd';
+
+import { useLoadingStore } from '@/stores/loading.store';
 
 export const TheLoading: React.FC = () => {
   const isLoading = useLoadingStore((state) => state.isLoading);

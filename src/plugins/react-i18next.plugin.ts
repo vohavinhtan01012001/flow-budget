@@ -1,8 +1,9 @@
+import i18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
 import type { TObjectString } from '@/models/types/shared.type';
 
 import { ELanguageCode } from '@/models/enums/shared.enum';
-import i18next from 'i18next';
-import { initReactI18next } from 'react-i18next';
 
 type TLocales = Record<string, { default: TObjectString }>;
 type TResources = Record<ELanguageCode, Record<string, TObjectString>>;

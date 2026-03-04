@@ -1,10 +1,25 @@
+import { yupResolver } from '@hookform/resolvers/yup';
+import {
+  CheckboxProps,
+  DatePickerProps,
+  Form,
+  PaginationProps,
+  TimePickerProps,
+} from 'antd';
+import { DefaultOptionType } from 'antd/es/select';
+import { Dayjs } from 'dayjs';
+import {
+  Bell,
+  FolderOpen,
+  LayoutDashboard,
+  Search,
+  Settings,
+  Trash2,
+} from 'lucide-react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { useDebounceCallback } from 'usehooks-ts';
+
 import { healthCheck } from '@/apis/shared.api';
-import IconDashboard from '@/assets/icons/shared/IconDashboard.svg?react';
-import IconDelete from '@/assets/icons/shared/IconDelete.svg?react';
-import IconFolderShared from '@/assets/icons/shared/IconFolderShared.svg?react';
-import IconNotification from '@/assets/icons/shared/IconNotification.svg?react';
-import IconSearch from '@/assets/icons/shared/IconSearch.svg?react';
-import IconSettings from '@/assets/icons/shared/IconSettings.svg?react';
 import styles from '@/assets/styles/components/shared/codebase.module.scss';
 import { BaseAutocomplete } from '@/components/shared/BaseAutocomplete';
 import { BaseButton } from '@/components/shared/BaseButton';
@@ -21,9 +36,7 @@ import { BaseSwitch } from '@/components/shared/BaseSwitch';
 import { BaseTable } from '@/components/shared/BaseTable';
 import { BaseTimePicker } from '@/components/shared/BaseTimePicker';
 import { SELECTORS } from '@/constants/shared.const';
-import { DEFAULT } from '@/constants/theme-colors.const';
 import { usePagination } from '@/hooks/shared/use-pagination';
-import { useThemeColor } from '@/hooks/shared/use-theme-color';
 import {
   baseCheckboxOptions,
   baseSelectOptions,
@@ -35,19 +48,6 @@ import { EToast } from '@/models/enums/shared.enum';
 import { codebaseSchema } from '@/schemas/shared.schema';
 import { useLoadingStore } from '@/stores/loading.store';
 import { showToast, sleep } from '@/utils/shared.util';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  CheckboxProps,
-  DatePickerProps,
-  Form,
-  PaginationProps,
-  TimePickerProps,
-  Tooltip,
-} from 'antd';
-import { DefaultOptionType } from 'antd/es/select';
-import { Dayjs } from 'dayjs';
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { useDebounceCallback } from 'usehooks-ts';
 
 interface IForm {
   email: string;
@@ -57,11 +57,6 @@ interface IForm {
   terms: boolean;
   type: string;
 }
-
-type TIcons = Record<
-  string,
-  { default: React.FC<React.SVGProps<SVGSVGElement>> }
->;
 
 export const Codebase: React.FC = () => {
   const codebaseForm = useForm<IForm>({
@@ -79,7 +74,6 @@ export const Codebase: React.FC = () => {
   const { t } = useTranslation();
   const hideLoading = useLoadingStore((state) => state.hideLoading);
   const showLoading = useLoadingStore((state) => state.showLoading);
-  const { getThemeColor } = useThemeColor();
   const { pagination, setPagination } = usePagination();
 
   const [baseCheckbox, setBaseCheckbox] = useState<boolean>(false);
@@ -95,7 +89,6 @@ export const Codebase: React.FC = () => {
   const [baseTimePicker, setBaseTimePicker] = useState<Dayjs | null>(null);
   const [baseModal, setBaseModal] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState<string>('');
-  const [svgIcons, setSvgIcons] = useState<Record<string, React.FC>>({});
 
   const handleGetHealthCheck = useDebounceCallback(async () => {
     await healthCheck();
@@ -193,22 +186,7 @@ export const Codebase: React.FC = () => {
     hideLoading();
   };
 
-  const loadSvgIcons = async () => {
-    const icons: TIcons = import.meta.glob('@/assets/icons/**/*.svg', {
-      eager: true,
-      query: '?react',
-    });
-    const newIcons: Record<string, React.FC> = {};
-
-    Object.entries(icons).forEach(([path, module]) => {
-      const iconName = path.split('/').pop()?.replace('.svg', '');
-      if (iconName) newIcons[iconName] = module.default;
-    });
-    setSvgIcons(newIcons);
-  };
-
   useEffect(() => {
-    loadSvgIcons();
     setPagination((state) => ({ ...state, total: tableData.length }));
   }, []);
 
@@ -232,14 +210,23 @@ export const Codebase: React.FC = () => {
       </section>
 
       <section>
-        <h4>-- SVG Icons --</h4>
+        <h4>-- Lucide Icons --</h4>
         <div className="tw-flex tw-gap-2">
-          {Object.entries(svgIcons).map(([iconName, IconComponent]) => (
-            <Tooltip key={iconName} title={iconName}>
-              <span onClick={handleClickIconSvg}>
-                <IconComponent />
-              </span>
-            </Tooltip>
+          {[
+            { Icon: Search, name: 'Search' },
+            { Icon: Settings, name: 'Settings' },
+            { Icon: LayoutDashboard, name: 'LayoutDashboard' },
+            { Icon: FolderOpen, name: 'FolderOpen' },
+            { Icon: Trash2, name: 'Trash2' },
+            { Icon: Bell, name: 'Bell' },
+          ].map(({ Icon, name }) => (
+            <span
+              key={name}
+              onClick={handleClickIconSvg}
+              title={name}
+            >
+              <Icon size={20} />
+            </span>
           ))}
         </div>
       </section>
@@ -324,49 +311,41 @@ export const Codebase: React.FC = () => {
 
         <div className="tw-flex tw-gap-2 tw-mb-4">
           <BaseButton
-            icon={<IconSearch fill={DEFAULT.WHITE} height="14" width="14" />}
+            icon={<Search size={14} />}
             onClick={handleClickButton}
             shape="circle"
           />
           <BaseButton
             color="blue"
-            icon={<IconSettings fill={DEFAULT.WHITE} height="14" width="14" />}
+            icon={<Settings size={14} />}
             onClick={handleClickButton}
             shape="circle"
             variant="solid"
           />
           <BaseButton
             color="green"
-            icon={<IconDashboard fill={DEFAULT.WHITE} height="14" width="14" />}
+            icon={<LayoutDashboard size={14} />}
             onClick={handleClickButton}
             shape="circle"
             variant="solid"
           />
           <BaseButton
             color="orange"
-            icon={
-              <IconFolderShared fill={DEFAULT.WHITE} height="14" width="14" />
-            }
+            icon={<FolderOpen size={14} />}
             onClick={handleClickButton}
             shape="circle"
             variant="solid"
           />
           <BaseButton
             color="danger"
-            icon={<IconDelete fill={DEFAULT.WHITE} height="14" width="14" />}
+            icon={<Trash2 size={14} />}
             onClick={handleClickButton}
             shape="circle"
             variant="solid"
           />
           <BaseButton
             color="default"
-            icon={
-              <IconNotification
-                fill={getThemeColor('ICON_SVG')}
-                height="14"
-                width="14"
-              />
-            }
+            icon={<Bell size={14} />}
             onClick={handleClickButton}
             shape="circle"
             variant="outlined"

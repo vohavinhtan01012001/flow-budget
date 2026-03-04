@@ -1,0 +1,61 @@
+import type { TCategoryStats } from '@/models/types/expense.type';
+
+import styles from '@/assets/styles/components/expense/dashboard.module.scss';
+import { formatVND } from '@/utils/expense-parser.util';
+
+interface IProps {
+  data: TCategoryStats[];
+}
+
+export const ChartPieCategory: React.FC<IProps> = ({ data }) => {
+  if (data.length === 0) {
+    return (
+      <div className="tw-text-center tw-py-8 tw-text-slate-400 tw-text-sm">
+        Chưa có dữ liệu
+      </div>
+    );
+  }
+
+  const total = data.reduce((sum, d) => sum + d.amount, 0);
+
+  return (
+    <div className={styles['dashboard-page__chart-container']}>
+      <div className="tw-space-y-3">
+        {data.map((item) => (
+          <div className="tw-flex tw-items-center tw-gap-3" key={item.categoryId}>
+            <span className="tw-text-lg tw-w-8 tw-text-center">{item.icon}</span>
+            <div className="tw-flex-1 tw-min-w-0">
+              <div className="tw-flex tw-justify-between tw-text-sm tw-mb-1.5">
+                <span className="tw-font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {item.categoryName}
+                </span>
+                <span className="tw-font-semibold tw-tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                  {formatVND(item.amount)}
+                </span>
+              </div>
+              <div
+                className="tw-h-2 tw-rounded-full tw-overflow-hidden"
+                style={{ background: 'var(--border-color)' }}
+              >
+                <div
+                  className="tw-h-full tw-rounded-full"
+                  style={{
+                    background: item.color ?? '#0ea5e9',
+                    transition: 'width 0.5s ease',
+                    width: `${(item.amount / total) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+            <span
+              className="tw-text-xs tw-font-semibold tw-w-10 tw-text-right tw-tabular-nums"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              {item.percentage.toFixed(0)}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};

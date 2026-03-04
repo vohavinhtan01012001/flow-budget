@@ -1,7 +1,7 @@
-import type { TOptions } from '@/models/types/shared.type';
-
 import { Checkbox } from 'antd';
 import { CheckboxGroupProps } from 'antd/es/checkbox';
+
+import type { TOptions } from '@/models/types/shared.type';
 
 interface IProps extends Omit<CheckboxGroupProps, 'options'> {
   options: TOptions[];
