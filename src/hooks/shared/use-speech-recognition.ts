@@ -73,10 +73,18 @@ async function sendToCloud(blob: Blob): Promise<string> {
   );
 
   if (error) {
-    console.error('[transcribe] invoke error:', error);
-    throw new Error(
-      error.message || 'Edge Function error',
-    );
+    // Extract detailed error from FunctionsHttpError response
+    let detail = error.message || 'Edge Function error';
+    try {
+      if ('context' in error && error.context instanceof Response) {
+        const body = await error.context.json();
+        detail = body.error || detail;
+      }
+    } catch {
+      // ignore parse failure
+    }
+    console.error('[transcribe] error:', detail);
+    throw new Error(detail);
   }
 
   if (!data?.transcript) {
