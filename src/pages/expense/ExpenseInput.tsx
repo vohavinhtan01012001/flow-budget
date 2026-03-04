@@ -1,4 +1,4 @@
-import { Button, message } from 'antd';
+import { Button } from 'antd';
 import dayjs from 'dayjs';
 
 import type { ILocalCategory } from '@/libs/dexie/db';
@@ -16,8 +16,6 @@ import { useCategoryStore } from '@/stores/category.store';
 import { useExpenseStore } from '@/stores/expense.store';
 import { useSyncStore } from '@/stores/sync.store';
 import { parseExpenseInput, resolveCategory } from '@/utils/expense-parser.util';
-import { toast } from '@/components/shared/Toast';
-import { EToast } from '@/models/enums/shared.enum';
 
 export const ExpenseInput: React.FC = () => {
   const userInfo = useAuthStore((s) => s.userInfo);
