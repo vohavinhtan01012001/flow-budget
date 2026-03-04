@@ -67,11 +67,23 @@ async function sendToCloud(blob: Blob): Promise<string> {
   formData.append('file', blob, `recording.${ext}`);
   formData.append('language', 'vi');
 
-  const { data, error } = await supabase.functions.invoke('transcribe', {
-    body: formData,
-  });
+  const { data, error } = await supabase.functions.invoke(
+    'transcribe',
+    { body: formData },
+  );
 
-  if (error) throw error;
+  if (error) {
+    console.error('[transcribe] invoke error:', error);
+    throw new Error(
+      error.message || 'Edge Function error',
+    );
+  }
+
+  if (!data?.transcript) {
+    console.error('[transcribe] unexpected response:', data);
+    throw new Error('Empty transcript');
+  }
+
   return data.transcript;
 }
 
@@ -115,8 +127,11 @@ export const useSpeechRecognition = (): ISpeechRecognitionHook => {
     try {
       const text = await sendToCloud(blob);
       if (text) setTranscript(text);
-    } catch {
-      message.error('Không thể nhận dạng giọng nói');
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : 'Unknown error';
+      console.error('[speech] cloud transcription failed:', msg);
+      message.error(`Không thể nhận dạng giọng nói: ${msg}`);
     } finally {
       setIsTranscribing(false);
     }
