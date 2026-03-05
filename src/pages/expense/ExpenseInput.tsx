@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import dayjs from 'dayjs';
 
-import type { ILocalCategory } from '@/libs/dexie/db';
+import type { ILocalCategory, ILocalExpense } from '@/libs/dexie/db';
 
 import styles from '@/assets/styles/components/expense/expense-input.module.scss';
 import { ExpenseCategoryChips } from '@/components/expense/ExpenseCategoryChips';
@@ -16,13 +16,14 @@ import { useBudgetStore } from '@/stores/budget.store';
 import { useCategoryStore } from '@/stores/category.store';
 import { useExpenseStore } from '@/stores/expense.store';
 import { useSyncStore } from '@/stores/sync.store';
-import { parseExpenseInput, resolveCategory } from '@/utils/expense-parser.util';
+import { formatVND, parseExpenseInput, resolveCategory } from '@/utils/expense-parser.util';
 
 export const ExpenseInput: React.FC = () => {
   const userInfo = useAuthStore((s) => s.userInfo);
   const categories = useCategoryStore((s) => s.categories);
   const loadCategories = useCategoryStore((s) => s.loadCategories);
   const addExpense = useExpenseStore((s) => s.addExpense);
+  const updateExpense = useExpenseStore((s) => s.updateExpense);
   const deleteExpense = useExpenseStore((s) => s.deleteExpense);
   const recentExpenses = useExpenseStore((s) => s.recentExpenses);
   const loadExpenses = useExpenseStore((s) => s.loadExpenses);
@@ -30,6 +31,7 @@ export const ExpenseInput: React.FC = () => {
   const pendingCount = useSyncStore((s) => s.pendingCount);
   const refreshPendingCount = useSyncStore((s) => s.refreshPendingCount);
   const { checkBudgets } = useBudgetAlert();
+  const [editingExpense, setEditingExpense] = useState<ILocalExpense | null>(null);
 
   const {
     isListening,
@@ -85,6 +87,19 @@ export const ExpenseInput: React.FC = () => {
     }
   }, [userInfo?.id]);
 
+  // Handle edit from History page navigation
+  const location = useLocation();
+  useEffect(() => {
+    const state = location.state as
+      | undefined
+      | { editExpense?: ILocalExpense };
+    if (state?.editExpense) {
+      handleEdit(state.editExpense);
+      // Clear the state so it doesn't re-trigger
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
+
   // Load custom keyword mappings and resolve to category names
   useEffect(() => {
     if (!userInfo?.id || categories.length === 0) return;
@@ -106,6 +121,25 @@ export const ExpenseInput: React.FC = () => {
       });
   }, [userInfo?.id, categories]);
 
+  const handleEdit = (expense: ILocalExpense) => {
+    setEditingExpense(expense);
+    const cat = categories.find(
+      (c) =>
+        c.serverId === expense.categoryId ||
+        String(c.localId) === expense.categoryId,
+    );
+    setSelectedCategory(cat ?? null);
+    setInputValue(
+      `${expense.description || ''} ${formatVND(expense.amount)}`.trim(),
+    );
+  };
+
+  const handleCancelEdit = () => {
+    setEditingExpense(null);
+    setInputValue('');
+    setSelectedCategory(null);
+  };
+
   const handleSubmit = async () => {
     if (!parsed || !userInfo?.id) return;
 
@@ -116,6 +150,21 @@ export const ExpenseInput: React.FC = () => {
     } else if (categoryName) {
       const cat = categories.find((c) => c.name === categoryName);
       if (cat) categoryId = cat.serverId ?? String(cat.localId);
+    }
+
+    if (editingExpense) {
+      await updateExpense(editingExpense.localId, {
+        amount: parsed.amount,
+        categoryId,
+        description: parsed.description || parsed.rawInput,
+      });
+      setEditingExpense(null);
+      setInputValue('');
+      setSelectedCategory(null);
+      if (navigator.vibrate) navigator.vibrate(50);
+      showToast('Đã cập nhật chi tiêu!');
+      await refreshPendingCount();
+      return;
     }
 
     await addExpense({
@@ -176,7 +225,20 @@ export const ExpenseInput: React.FC = () => {
       </div>
 
       {parsed && (
-        <div className="tw-mb-4">
+        <div className="tw-mb-4 tw-flex tw-gap-2">
+          {editingExpense && (
+            <Button
+              onClick={handleCancelEdit}
+              size="large"
+              style={{
+                borderRadius: 14,
+                fontWeight: 600,
+                height: 50,
+              }}
+            >
+              Hủy
+            </Button>
+          )}
           <Button
             block
             onClick={handleSubmit}
@@ -189,7 +251,7 @@ export const ExpenseInput: React.FC = () => {
             }}
             type="primary"
           >
-            Thêm chi tiêu
+            {editingExpense ? 'Cập nhật' : 'Thêm chi tiêu'}
           </Button>
         </div>
       )}
@@ -211,6 +273,7 @@ export const ExpenseInput: React.FC = () => {
               expense={expense}
               key={expense.localId}
               onDelete={deleteExpense}
+              onEdit={handleEdit}
             />
           ))}
         </div>

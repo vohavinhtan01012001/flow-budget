@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 
 import { Button, DatePicker, Input, Select } from 'antd';
+import dayjs from 'dayjs';
 
 import type { TExpenseFilter } from '@/models/types/expense.type';
 
@@ -103,21 +103,19 @@ export const ExpenseFilter: React.FC<IProps> = ({
       <div className="tw-flex tw-gap-2">
         <DatePicker
           allowClear
-          getPopupContainer={(trigger) =>
-            trigger.parentElement ?? document.body
-          }
+          inputReadOnly
           onChange={handleStartChange}
           placeholder="Từ ngày"
+          popupStyle={{ position: 'fixed' }}
           style={{ flex: 1 }}
           value={startDate}
         />
         <DatePicker
           allowClear
-          getPopupContainer={(trigger) =>
-            trigger.parentElement ?? document.body
-          }
+          inputReadOnly
           onChange={handleEndChange}
           placeholder="Đến ngày"
+          popupStyle={{ position: 'fixed' }}
           style={{ flex: 1 }}
           value={endDate}
         />

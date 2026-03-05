@@ -2,6 +2,7 @@ import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { Search } from 'lucide-react';
 
+import type { ILocalExpense } from '@/libs/dexie/db';
 import type { TExpenseFilter } from '@/models/types/expense.type';
 
 import styles from '@/assets/styles/components/expense/dashboard.module.scss';
@@ -24,6 +25,11 @@ export const History: React.FC = () => {
   const loadCategories = useCategoryStore((s) => s.loadCategories);
 
   const [showFilters, setShowFilters] = useState(false);
+  const navigate = useNavigate();
+
+  const handleEdit = (expense: ILocalExpense) => {
+    navigate(EXPENSE_PAGES.INPUT, { state: { editExpense: expense } });
+  };
 
   useEffect(() => {
     if (userInfo?.id) {
@@ -118,6 +124,7 @@ export const History: React.FC = () => {
                 expense={expense}
                 key={expense.localId}
                 onDelete={handleDelete}
+                onEdit={handleEdit}
               />
             ))}
           </div>

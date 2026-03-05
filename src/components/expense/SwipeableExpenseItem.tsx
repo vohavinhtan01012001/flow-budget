@@ -1,13 +1,17 @@
+import { Pencil, Trash2 } from 'lucide-react';
+
 import type { ILocalCategory, ILocalExpense } from '@/libs/dexie/db';
 
 import styles from '@/assets/styles/components/expense/swipeable-item.module.scss';
-import { confirm } from '@/components/shared/ConfirmDialog';
 import { ExpenseListItem } from '@/components/expense/ExpenseListItem';
+import { actionSheet } from '@/components/shared/ActionSheet';
+import { confirm } from '@/components/shared/ConfirmDialog';
 
 interface IProps {
   categories: ILocalCategory[];
   expense: ILocalExpense;
   onDelete: (localId: number) => void;
+  onEdit?: (expense: ILocalExpense) => void;
 }
 
 const SWIPE_THRESHOLD = 80;
@@ -17,18 +21,19 @@ export const SwipeableExpenseItem: React.FC<IProps> = ({
   categories,
   expense,
   onDelete,
+  onEdit,
 }) => {
   const [offsetX, setOffsetX] = useState(0);
   const [swiping, setSwiping] = useState(false);
   const startX = useRef(0);
   const startY = useRef(0);
   const isHorizontal = useRef<boolean | null>(null);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(
+  const longPressTimer = useRef<null | ReturnType<typeof setTimeout>>(
     null,
   );
   const didLongPress = useRef(false);
 
-  const showConfirm = useCallback(() => {
+  const showDeleteConfirm = useCallback(() => {
     confirm({
       content: `${expense.description || 'Chi tiêu'} sẽ bị xóa vĩnh viễn.`,
       danger: true,
@@ -37,6 +42,25 @@ export const SwipeableExpenseItem: React.FC<IProps> = ({
       title: 'Xóa chi tiêu?',
     });
   }, [expense, onDelete]);
+
+  const showActions = useCallback(() => {
+    actionSheet({
+      options: [
+        {
+          icon: <Pencil size={18} />,
+          label: 'Chỉnh sửa',
+          onClick: () => onEdit?.(expense),
+        },
+        {
+          danger: true,
+          icon: <Trash2 size={18} />,
+          label: 'Xóa',
+          onClick: showDeleteConfirm,
+        },
+      ],
+      title: expense.description || 'Chi tiêu',
+    });
+  }, [expense, onEdit, showDeleteConfirm]);
 
   const clearLongPress = () => {
     if (longPressTimer.current) {
@@ -55,7 +79,7 @@ export const SwipeableExpenseItem: React.FC<IProps> = ({
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true;
       if (navigator.vibrate) navigator.vibrate(30);
-      showConfirm();
+      showActions();
     }, LONG_PRESS_MS);
   };
 
@@ -90,7 +114,7 @@ export const SwipeableExpenseItem: React.FC<IProps> = ({
     }
 
     if (offsetX < -SWIPE_THRESHOLD) {
-      showConfirm();
+      showDeleteConfirm();
     }
 
     setSwiping(false);
