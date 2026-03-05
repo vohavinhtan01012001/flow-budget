@@ -32,6 +32,8 @@ export const ExpenseInput: React.FC = () => {
   const refreshPendingCount = useSyncStore((s) => s.refreshPendingCount);
   const { checkBudgets } = useBudgetAlert();
   const [editingExpense, setEditingExpense] = useState<ILocalExpense | null>(null);
+  const [overrideAmount, setOverrideAmount] = useState<null | number>(null);
+  const [overrideDesc, setOverrideDesc] = useState<null | string>(null);
 
   const {
     isListening,
@@ -138,10 +140,15 @@ export const ExpenseInput: React.FC = () => {
     setEditingExpense(null);
     setInputValue('');
     setSelectedCategory(null);
+    setOverrideAmount(null);
+    setOverrideDesc(null);
   };
 
   const handleSubmit = async () => {
     if (!parsed || !userInfo?.id) return;
+
+    const finalAmount = overrideAmount ?? parsed.amount;
+    const finalDesc = overrideDesc ?? (parsed.description || parsed.rawInput);
 
     let categoryId: null | string = null;
     if (selectedCategory) {
@@ -154,13 +161,15 @@ export const ExpenseInput: React.FC = () => {
 
     if (editingExpense) {
       await updateExpense(editingExpense.localId, {
-        amount: parsed.amount,
+        amount: finalAmount,
         categoryId,
-        description: parsed.description || parsed.rawInput,
+        description: finalDesc,
       });
       setEditingExpense(null);
       setInputValue('');
       setSelectedCategory(null);
+      setOverrideAmount(null);
+      setOverrideDesc(null);
       if (navigator.vibrate) navigator.vibrate(50);
       showToast('Đã cập nhật chi tiêu!');
       await refreshPendingCount();
@@ -168,9 +177,9 @@ export const ExpenseInput: React.FC = () => {
     }
 
     await addExpense({
-      amount: parsed.amount,
+      amount: finalAmount,
       categoryId,
-      description: parsed.description || parsed.rawInput,
+      description: finalDesc,
       expenseDate: dayjs().toISOString(),
       note: null,
       userId: userInfo.id,
@@ -178,6 +187,8 @@ export const ExpenseInput: React.FC = () => {
 
     setInputValue('');
     setSelectedCategory(null);
+    setOverrideAmount(null);
+    setOverrideDesc(null);
 
     if (navigator.vibrate) navigator.vibrate(50);
     showToast('Đã thêm chi tiêu!');
@@ -221,7 +232,22 @@ export const ExpenseInput: React.FC = () => {
       </div>
 
       <div className={styles['expense-input-page__preview']}>
-        <ExpensePreview categoryName={categoryName} parsed={parsed} />
+        <ExpensePreview
+          categories={categories}
+          categoryName={categoryName}
+          onAmountChange={setOverrideAmount}
+          onCategoryChange={handleCategorySelect}
+          onDescriptionChange={setOverrideDesc}
+          parsed={
+            parsed
+              ? {
+                  ...parsed,
+                  amount: overrideAmount ?? parsed.amount,
+                  description: overrideDesc ?? parsed.description,
+                }
+              : null
+          }
+        />
       </div>
 
       {parsed && (
