@@ -1,4 +1,4 @@
-import { Progress } from 'antd';
+import { Button, Progress } from 'antd';
 
 import type { ILocalBudget } from '@/libs/dexie/db';
 
@@ -9,6 +9,7 @@ interface IProps {
   budget: ILocalBudget;
   categoryName: string;
   icon: string;
+  onDelete?: (localId: number) => void;
   spent: number;
 }
 
@@ -22,6 +23,7 @@ export const BudgetCard: React.FC<IProps> = ({
   budget,
   categoryName,
   icon,
+  onDelete,
   spent,
 }) => {
   const percentage = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
@@ -43,9 +45,21 @@ export const BudgetCard: React.FC<IProps> = ({
         <span className={styles['budget-card__name']}>
           {icon} {categoryName}
         </span>
-        <span className={styles['budget-card__period']}>
-          {PERIOD_LABELS[budget.period] ?? budget.period}
-        </span>
+        <div className="tw-flex tw-items-center tw-gap-2">
+          <span className={styles['budget-card__period']}>
+            {PERIOD_LABELS[budget.period] ?? budget.period}
+          </span>
+          {onDelete && (
+            <Button
+              danger
+              onClick={() => onDelete(budget.localId)}
+              size="small"
+              type="text"
+            >
+              Xóa
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className={styles['budget-card__progress']}>

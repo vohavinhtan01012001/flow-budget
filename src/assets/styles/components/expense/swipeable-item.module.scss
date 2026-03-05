@@ -1,0 +1,35 @@
+.swipeable-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  margin-bottom: 8px;
+
+  &__delete-bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--danger);
+    border-radius: 14px;
+    transition: opacity 0.15s ease;
+
+    span {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}

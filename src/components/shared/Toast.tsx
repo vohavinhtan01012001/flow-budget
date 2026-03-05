@@ -1,5 +1,5 @@
-import React from 'react';
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
+import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
 import { EToast } from '@/models/enums/shared.enum';

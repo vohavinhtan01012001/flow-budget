@@ -5,11 +5,12 @@ import type { ILocalCategory } from '@/libs/dexie/db';
 
 import styles from '@/assets/styles/components/expense/expense-input.module.scss';
 import { ExpenseCategoryChips } from '@/components/expense/ExpenseCategoryChips';
-import { ExpenseListItem } from '@/components/expense/ExpenseListItem';
 import { ExpensePreview } from '@/components/expense/ExpensePreview';
 import { ExpenseQuickInput } from '@/components/expense/ExpenseQuickInput';
+import { SwipeableExpenseItem } from '@/components/expense/SwipeableExpenseItem';
 import { useBudgetAlert } from '@/hooks/shared/use-budget-alert';
 import { useSpeechRecognition } from '@/hooks/shared/use-speech-recognition';
+import { db } from '@/libs/dexie/db';
 import { useAuthStore } from '@/stores/auth.store';
 import { useBudgetStore } from '@/stores/budget.store';
 import { useCategoryStore } from '@/stores/category.store';
@@ -22,6 +23,7 @@ export const ExpenseInput: React.FC = () => {
   const categories = useCategoryStore((s) => s.categories);
   const loadCategories = useCategoryStore((s) => s.loadCategories);
   const addExpense = useExpenseStore((s) => s.addExpense);
+  const deleteExpense = useExpenseStore((s) => s.deleteExpense);
   const recentExpenses = useExpenseStore((s) => s.recentExpenses);
   const loadExpenses = useExpenseStore((s) => s.loadExpenses);
   const loadBudgets = useBudgetStore((s) => s.loadBudgets);
@@ -41,6 +43,9 @@ export const ExpenseInput: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [selectedCategory, setSelectedCategory] =
     useState<ILocalCategory | null>(null);
+  const [customMappings, setCustomMappings] = useState<
+    Record<string, string>
+  >({});
 
   // Feed voice transcript into input
   useEffect(() => {
@@ -50,17 +55,26 @@ export const ExpenseInput: React.FC = () => {
   }, [transcript]);
 
   const parsed = useMemo(
-    () => parseExpenseInput(inputValue),
-    [inputValue],
+    () => parseExpenseInput(inputValue, customMappings),
+    [inputValue, customMappings],
+  );
+
+  const categoryNames = useMemo(
+    () => categories.map((c) => c.name),
+    [categories],
   );
 
   const categoryName = useMemo(() => {
     if (selectedCategory) return selectedCategory.name;
     if (parsed?.categoryKeyword) {
-      return resolveCategory(parsed.categoryKeyword);
+      return resolveCategory(
+        parsed.categoryKeyword,
+        customMappings,
+        categoryNames,
+      );
     }
     return null;
-  }, [parsed, selectedCategory]);
+  }, [parsed, selectedCategory, customMappings, categoryNames]);
 
   useEffect(() => {
     if (userInfo?.id) {
@@ -70,6 +84,27 @@ export const ExpenseInput: React.FC = () => {
       refreshPendingCount();
     }
   }, [userInfo?.id]);
+
+  // Load custom keyword mappings and resolve to category names
+  useEffect(() => {
+    if (!userInfo?.id || categories.length === 0) return;
+    db.keywordMappings
+      .where('userId')
+      .equals(userInfo.id)
+      .toArray()
+      .then((mappings) => {
+        const map: Record<string, string> = {};
+        for (const m of mappings) {
+          const cat = categories.find(
+            (c) =>
+              c.serverId === m.categoryId ||
+              String(c.localId) === m.categoryId,
+          );
+          if (cat) map[m.keyword] = cat.name;
+        }
+        setCustomMappings(map);
+      });
+  }, [userInfo?.id, categories]);
 
   const handleSubmit = async () => {
     if (!parsed || !userInfo?.id) return;
@@ -171,10 +206,11 @@ export const ExpenseInput: React.FC = () => {
         <div className={styles['expense-input-page__recent']}>
           <h3>Gần đây</h3>
           {recentExpenses.map((expense) => (
-            <ExpenseListItem
+            <SwipeableExpenseItem
               categories={categories}
               expense={expense}
               key={expense.localId}
+              onDelete={deleteExpense}
             />
           ))}
         </div>

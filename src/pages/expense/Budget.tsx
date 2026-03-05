@@ -110,23 +110,14 @@ export const Budget: React.FC = () => {
         );
 
         return (
-          <div key={b.localId} style={{ position: 'relative' }}>
-            <BudgetCard
-              budget={b}
-              categoryName={cat?.name ?? 'Tổng'}
-              icon={cat?.icon ?? '💰'}
-              spent={spent}
-            />
-            <Button
-              className="tw-absolute tw-top-3 tw-right-3"
-              danger
-              onClick={() => deleteBudget(b.localId)}
-              size="small"
-              type="text"
-            >
-              Xóa
-            </Button>
-          </div>
+          <BudgetCard
+            budget={b}
+            categoryName={cat?.name ?? 'Tổng'}
+            icon={cat?.icon ?? '💰'}
+            key={b.localId}
+            onDelete={deleteBudget}
+            spent={spent}
+          />
         );
       })}
 

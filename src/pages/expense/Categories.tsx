@@ -1,6 +1,7 @@
 import { Button, ColorPicker, Input, List, Modal, Space } from 'antd';
 
 import { confirm } from '@/components/shared/ConfirmDialog';
+import { EToast } from '@/models/enums/shared.enum';
 import { useAuthStore } from '@/stores/auth.store';
 import { useCategoryStore } from '@/stores/category.store';
 
@@ -22,11 +23,17 @@ export const Categories: React.FC = () => {
 
   const handleAdd = async () => {
     if (!name.trim() || !userInfo?.id) return;
-    await addCategory(name.trim(), icon, color, userInfo.id);
-    setName('');
-    setIcon('📦');
-    setColor('#0ea5e9');
-    setIsModalOpen(false);
+    try {
+      await addCategory(name.trim(), icon, color, userInfo.id);
+      setName('');
+      setIcon('📦');
+      setColor('#0ea5e9');
+      setIsModalOpen(false);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'DUPLICATE_CATEGORY') {
+        showToast(`Danh mục "${name.trim()}" đã tồn tại!`, EToast.Warning);
+      }
+    }
   };
 
   const handleDelete = async (localId: number, isPreset: boolean) => {

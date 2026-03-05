@@ -27,6 +27,14 @@ let seedingPromise: null | Promise<void> = null;
 export const useCategoryStore = create<IState>()(
   devtools((set, get) => ({
     addCategory: async (name, icon, color, userId) => {
+      // Check duplicate name
+      const existing = get().categories.find(
+        (c) => c.name.toLowerCase() === name.toLowerCase(),
+      );
+      if (existing) {
+        throw new Error('DUPLICATE_CATEGORY');
+      }
+
       const localId = await db.categories.add({
         color,
         icon,

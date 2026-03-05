@@ -1,11 +1,12 @@
-import { Button, Popconfirm } from 'antd';
+import { Button } from 'antd';
 import dayjs from 'dayjs';
+import { Search } from 'lucide-react';
 
 import type { TExpenseFilter } from '@/models/types/expense.type';
 
 import styles from '@/assets/styles/components/expense/dashboard.module.scss';
 import { ExpenseFilter } from '@/components/expense/ExpenseFilter';
-import { ExpenseListItem } from '@/components/expense/ExpenseListItem';
+import { SwipeableExpenseItem } from '@/components/expense/SwipeableExpenseItem';
 import { useAuthStore } from '@/stores/auth.store';
 import { useCategoryStore } from '@/stores/category.store';
 import { useExpenseStore } from '@/stores/expense.store';
@@ -47,8 +48,8 @@ export const History: React.FC = () => {
     exportToCSV(expenses, categories);
   };
 
-  const handleExportPDF = () => {
-    exportToPDF(expenses, categories);
+  const handleExportPDF = async () => {
+    await exportToPDF(expenses, categories);
   };
 
   // Group expenses by date
@@ -73,7 +74,7 @@ export const History: React.FC = () => {
         <h2>Lịch sử</h2>
         <div className="tw-flex tw-gap-2">
           <Button onClick={() => setShowFilters(!showFilters)} size="small">
-            🔍
+            <Search size={16} />
           </Button>
           <Button onClick={handleExportCSV} size="small">
             CSV
@@ -112,20 +113,12 @@ export const History: React.FC = () => {
               {formatVND(items.reduce((s, e) => s + e.amount, 0))}
             </div>
             {items.map((expense) => (
-              <Popconfirm
-                cancelText="Hủy"
+              <SwipeableExpenseItem
+                categories={categories}
+                expense={expense}
                 key={expense.localId}
-                okText="Xóa"
-                onConfirm={() => handleDelete(expense.localId)}
-                title="Xóa chi tiêu này?"
-              >
-                <div style={{ cursor: 'pointer' }}>
-                  <ExpenseListItem
-                    categories={categories}
-                    expense={expense}
-                  />
-                </div>
-              </Popconfirm>
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         ))

@@ -6,53 +6,61 @@
  */
 
 const DIGIT_MAP: Record<string, number> = {
+  'ba': 3,
+  'bảy': 7,
   'bốn': 4,
   'chín': 9,
   'hai': 2,
   'không': 0,
   'lăm': 5,
-  'linh': 0,
   'lẻ': 0,
-  'một': 1,
+  'linh': 0,
   'mốt': 1,
-  'mười': 10,
+  'một': 1,
   'mươi': 10,
+  'mười': 10,
   'năm': 5,
   'nửa': 5,
   'sáu': 6,
   'tám': 8,
   'tư': 4,
-  'ba': 3,
-  'bảy': 7,
 };
 
 const UNIT_MAP: Record<string, number> = {
   'ngàn': 1_000,
-  'nghìn': 1_000,
   'nghin': 1_000,
-  'triệu': 1_000_000,
+  'nghìn': 1_000,
   'trieu': 1_000_000,
+  'triệu': 1_000_000,
 };
 
 // All known Vietnamese number words
 const ALL_WORDS = new Set([
+  'rưỡi',
+  'trăm',
   ...Object.keys(DIGIT_MAP),
   ...Object.keys(UNIT_MAP),
-  'trăm',
 ]);
 
-function parseVietnameseNumber(words: string[]): number | null {
+function parseVietnameseNumber(words: string[]): null | number {
   if (words.length === 0) return null;
 
   let total = 0;
   let current = 0;
+  let lastUnit = 0;
   let hasNumber = false;
 
   for (const w of words) {
     const digit = DIGIT_MAP[w];
     const unit = UNIT_MAP[w];
 
-    if (w === 'trăm') {
+    if (w === 'rưỡi') {
+      // "rưỡi" = half of the last unit (e.g., "một triệu rưỡi" = 1,500,000)
+      if (lastUnit > 0) {
+        total += lastUnit / 2;
+      }
+      hasNumber = true;
+    } else if (w === 'trăm') {
       current = (current || 1) * 100;
       hasNumber = true;
     } else if (w === 'mười' || w === 'mươi') {
@@ -61,6 +69,7 @@ function parseVietnameseNumber(words: string[]): number | null {
     } else if (unit !== undefined) {
       current = (current || 1) * unit;
       total += current;
+      lastUnit = unit;
       current = 0;
       hasNumber = true;
     } else if (digit !== undefined) {

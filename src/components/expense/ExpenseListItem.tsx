@@ -5,11 +5,13 @@ import { formatVND } from '@/utils/expense-parser.util';
 
 interface IProps {
   categories: ILocalCategory[];
+  className?: string;
   expense: ILocalExpense;
 }
 
 export const ExpenseListItem: React.FC<IProps> = ({
   categories,
+  className,
   expense,
 }) => {
   const category = categories.find(
@@ -19,7 +21,9 @@ export const ExpenseListItem: React.FC<IProps> = ({
   );
 
   return (
-    <div className={styles['expense-list-item']}>
+    <div
+      className={`${styles['expense-list-item']} ${className ?? ''}`}
+    >
       <div
         className={styles['expense-list-item__icon']}
         style={{ background: category?.color ? `${category.color}20` : '#f0f0f0' }}
