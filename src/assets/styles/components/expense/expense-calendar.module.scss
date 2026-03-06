@@ -1,0 +1,72 @@
+.calendar {
+  &__dot-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--danger);
+    display: inline-block;
+  }
+
+  // Override Ant Calendar compact cells to prevent overflow
+  :global {
+    .ant-picker-calendar {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 8px;
+
+      .ant-picker-panel {
+        background: transparent;
+        border-top: none;
+      }
+
+      .ant-picker-cell {
+        padding: 2px 0;
+
+        .ant-picker-cell-inner {
+          min-width: 28px;
+          height: auto;
+          line-height: 28px;
+          border-radius: 8px;
+        }
+      }
+
+      .ant-picker-cell-selected .ant-picker-cell-inner {
+        border-radius: 8px;
+      }
+
+      .ant-picker-content th {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+    }
+  }
+
+  &__detail {
+    margin-top: 16px;
+  }
+
+  &__detail-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    padding-left: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 24px 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+}

@@ -1,6 +1,12 @@
 import { Button, Segmented } from 'antd';
 import dayjs from 'dayjs';
-import { CalendarDays, List, Search } from 'lucide-react';
+import {
+  CalendarDays,
+  Download,
+  FileSpreadsheet,
+  Filter,
+  List,
+} from 'lucide-react';
 
 import type { ILocalExpense } from '@/libs/dexie/db';
 import type { TExpenseFilter } from '@/models/types/expense.type';
@@ -82,31 +88,38 @@ export const History: React.FC = () => {
     <div className={styles['history-page']}>
       <div className={styles['history-page__header']}>
         <h2>Lịch sử</h2>
-        <div className="tw-flex tw-gap-2 tw-items-center">
+        <div className="tw-flex tw-gap-1.5 tw-items-center">
           <Segmented
             onChange={(val) => setViewMode(val as TViewMode)}
             options={[
               {
-                icon: <List size={16} />,
+                icon: <List size={14} />,
                 value: 'list',
               },
               {
-                icon: <CalendarDays size={16} />,
+                icon: <CalendarDays size={14} />,
                 value: 'calendar',
               },
             ]}
             size="small"
             value={viewMode}
           />
-          <Button onClick={() => setShowFilters(!showFilters)} size="small">
-            <Search size={16} />
-          </Button>
-          <Button onClick={handleExportCSV} size="small">
-            CSV
-          </Button>
-          <Button onClick={handleExportPDF} size="small">
-            PDF
-          </Button>
+          <Button
+            icon={<Filter size={14} />}
+            onClick={() => setShowFilters(!showFilters)}
+            size="small"
+            type={showFilters ? 'primary' : 'default'}
+          />
+          <Button
+            icon={<FileSpreadsheet size={14} />}
+            onClick={handleExportCSV}
+            size="small"
+          />
+          <Button
+            icon={<Download size={14} />}
+            onClick={handleExportPDF}
+            size="small"
+          />
         </div>
       </div>
 
