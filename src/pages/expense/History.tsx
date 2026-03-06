@@ -1,11 +1,12 @@
-import { Button } from 'antd';
+import { Button, Segmented } from 'antd';
 import dayjs from 'dayjs';
-import { Search } from 'lucide-react';
+import { CalendarDays, List, Search } from 'lucide-react';
 
 import type { ILocalExpense } from '@/libs/dexie/db';
 import type { TExpenseFilter } from '@/models/types/expense.type';
 
 import styles from '@/assets/styles/components/expense/dashboard.module.scss';
+import { ExpenseCalendar } from '@/components/expense/ExpenseCalendar';
 import { ExpenseFilter } from '@/components/expense/ExpenseFilter';
 import { SwipeableExpenseItem } from '@/components/expense/SwipeableExpenseItem';
 import { useAuthStore } from '@/stores/auth.store';
@@ -13,6 +14,8 @@ import { useCategoryStore } from '@/stores/category.store';
 import { useExpenseStore } from '@/stores/expense.store';
 import { formatVND } from '@/utils/expense-parser.util';
 import { exportToCSV, exportToPDF } from '@/utils/export.util';
+
+type TViewMode = 'calendar' | 'list';
 
 export const History: React.FC = () => {
   const userInfo = useAuthStore((s) => s.userInfo);
@@ -25,6 +28,7 @@ export const History: React.FC = () => {
   const loadCategories = useCategoryStore((s) => s.loadCategories);
 
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<TViewMode>('list');
   const navigate = useNavigate();
 
   const handleEdit = (expense: ILocalExpense) => {
@@ -78,7 +82,22 @@ export const History: React.FC = () => {
     <div className={styles['history-page']}>
       <div className={styles['history-page__header']}>
         <h2>Lịch sử</h2>
-        <div className="tw-flex tw-gap-2">
+        <div className="tw-flex tw-gap-2 tw-items-center">
+          <Segmented
+            onChange={(val) => setViewMode(val as TViewMode)}
+            options={[
+              {
+                icon: <List size={16} />,
+                value: 'list',
+              },
+              {
+                icon: <CalendarDays size={16} />,
+                value: 'calendar',
+              },
+            ]}
+            size="small"
+            value={viewMode}
+          />
           <Button onClick={() => setShowFilters(!showFilters)} size="small">
             <Search size={16} />
           </Button>
@@ -100,35 +119,46 @@ export const History: React.FC = () => {
         </div>
       )}
 
-      {expenses.length > 0 && (
-        <div className={styles['history-page__total']}>
-          Tổng: <strong>{formatVND(total)}</strong> ({expenses.length}{' '}
-          khoản)
-        </div>
-      )}
-
-      {grouped.length === 0 ? (
-        <div className={styles['history-page__empty']}>
-          Chưa có chi tiêu nào
-        </div>
+      {viewMode === 'calendar' ? (
+        <ExpenseCalendar
+          categories={categories}
+          expenses={expenses}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
       ) : (
-        grouped.map(([date, items]) => (
-          <div className={styles['history-page__date-group']} key={date}>
-            <div className={styles['history-page__date-group-title']}>
-              {dayjs(date).format('DD/MM/YYYY')} —{' '}
-              {formatVND(items.reduce((s, e) => s + e.amount, 0))}
+        <>
+          {expenses.length > 0 && (
+            <div className={styles['history-page__total']}>
+              Tổng: <strong>{formatVND(total)}</strong> ({expenses.length}{' '}
+              khoản)
             </div>
-            {items.map((expense) => (
-              <SwipeableExpenseItem
-                categories={categories}
-                expense={expense}
-                key={expense.localId}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-              />
-            ))}
-          </div>
-        ))
+          )}
+
+          {grouped.length === 0 ? (
+            <div className={styles['history-page__empty']}>
+              Chưa có chi tiêu nào
+            </div>
+          ) : (
+            grouped.map(([date, items]) => (
+              <div className={styles['history-page__date-group']} key={date}>
+                <div className={styles['history-page__date-group-title']}>
+                  {dayjs(date).format('DD/MM/YYYY')} —{' '}
+                  {formatVND(items.reduce((s, e) => s + e.amount, 0))}
+                </div>
+                {items.map((expense) => (
+                  <SwipeableExpenseItem
+                    categories={categories}
+                    expense={expense}
+                    key={expense.localId}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
+                  />
+                ))}
+              </div>
+            ))
+          )}
+        </>
       )}
     </div>
   );
