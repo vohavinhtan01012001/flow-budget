@@ -1,16 +1,14 @@
 .calendar {
-  &__dot-wrap {
-    display: flex;
-    justify-content: center;
-    margin-top: 2px;
-  }
-
-  &__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--danger);
-    display: inline-block;
+  &__amount {
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--danger);
+    text-align: center;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   // Override Ant Calendar compact cells to prevent overflow

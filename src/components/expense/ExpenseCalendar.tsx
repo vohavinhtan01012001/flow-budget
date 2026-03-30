@@ -26,15 +26,17 @@ export const ExpenseCalendar: React.FC<IProps> = ({
     dayjs().format('YYYY-MM-DD'),
   );
 
-  const expensesByDate = useMemo(() => {
+  const { expensesByDate, totalsByDate } = useMemo(() => {
     const map = new Map<string, ILocalExpense[]>();
+    const totals = new Map<string, number>();
     expenses.forEach((e) => {
       const key = dayjs(e.expenseDate).format('YYYY-MM-DD');
       const arr = map.get(key) ?? [];
       arr.push(e);
       map.set(key, arr);
+      totals.set(key, (totals.get(key) ?? 0) + e.amount);
     });
-    return map;
+    return { expensesByDate: map, totalsByDate: totals };
   }, [expenses]);
 
   const selectedExpenses = expensesByDate.get(selectedDate) ?? [];
@@ -51,12 +53,12 @@ export const ExpenseCalendar: React.FC<IProps> = ({
 
   const cellRender = (date: Dayjs) => {
     const key = date.format('YYYY-MM-DD');
-    const items = expensesByDate.get(key);
-    if (!items?.length) return null;
+    const total = totalsByDate.get(key);
+    if (!total) return null;
 
     return (
-      <div className={styles['calendar__dot-wrap']}>
-        <span className={styles['calendar__dot']} />
+      <div className={styles['calendar__amount']}>
+        {formatAmountShort(total)}
       </div>
     );
   };

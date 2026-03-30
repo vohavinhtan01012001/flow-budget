@@ -45,6 +45,7 @@ export const ExpenseInput: React.FC = () => {
   } = useSpeechRecognition();
 
   const [inputValue, setInputValue] = useState('');
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedCategory, setSelectedCategory] =
     useState<ILocalCategory | null>(null);
   const [customMappings, setCustomMappings] = useState<
@@ -131,6 +132,7 @@ export const ExpenseInput: React.FC = () => {
         String(c.localId) === expense.categoryId,
     );
     setSelectedCategory(cat ?? null);
+    setSelectedDate(dayjs(expense.expenseDate));
     setInputValue(
       `${expense.description || ''} ${formatVND(expense.amount)}`.trim(),
     );
@@ -140,6 +142,7 @@ export const ExpenseInput: React.FC = () => {
     setEditingExpense(null);
     setInputValue('');
     setSelectedCategory(null);
+    setSelectedDate(dayjs());
     setOverrideAmount(null);
     setOverrideDesc(null);
   };
@@ -164,6 +167,7 @@ export const ExpenseInput: React.FC = () => {
         amount: finalAmount,
         categoryId,
         description: finalDesc,
+        expenseDate: selectedDate.toISOString(),
       });
       setEditingExpense(null);
       setInputValue('');
@@ -180,7 +184,7 @@ export const ExpenseInput: React.FC = () => {
       amount: finalAmount,
       categoryId,
       description: finalDesc,
-      expenseDate: dayjs().toISOString(),
+      expenseDate: selectedDate.toISOString(),
       note: null,
       userId: userInfo.id,
     });
@@ -237,6 +241,7 @@ export const ExpenseInput: React.FC = () => {
           categoryName={categoryName}
           onAmountChange={setOverrideAmount}
           onCategoryChange={handleCategorySelect}
+          onDateChange={setSelectedDate}
           onDescriptionChange={setOverrideDesc}
           parsed={
             parsed
@@ -247,6 +252,7 @@ export const ExpenseInput: React.FC = () => {
                 }
               : null
           }
+          selectedDate={selectedDate}
         />
       </div>
 

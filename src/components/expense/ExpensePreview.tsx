@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { Pencil } from 'lucide-react';
 
 import type { ILocalCategory } from '@/libs/dexie/db';
@@ -11,8 +12,10 @@ interface IProps {
   categoryName: null | string;
   onAmountChange?: (amount: number) => void;
   onCategoryChange?: (cat: ILocalCategory) => void;
+  onDateChange?: (date: dayjs.Dayjs) => void;
   onDescriptionChange?: (desc: string) => void;
   parsed: null | TParsedExpense;
+  selectedDate: dayjs.Dayjs;
 }
 
 type TEditingField = 'amount' | 'description' | null;
@@ -22,8 +25,10 @@ export const ExpensePreview: React.FC<IProps> = ({
   categoryName,
   onAmountChange,
   onCategoryChange,
+  onDateChange,
   onDescriptionChange,
   parsed,
+  selectedDate,
 }) => {
   const [editing, setEditing] = useState<TEditingField>(null);
   const [editAmount, setEditAmount] = useState('');
@@ -133,6 +138,21 @@ export const ExpensePreview: React.FC<IProps> = ({
             size={12}
           />
         </span>
+      </div>
+
+      {/* Date row */}
+      <div className={styles['expense-preview__row']}>
+        <span className={styles['expense-preview__label']}>Ngày</span>
+        <input
+          className={styles['expense-preview__date-input']}
+          max={dayjs().format('YYYY-MM-DD')}
+          onChange={(e) => {
+            const d = dayjs(e.target.value, 'YYYY-MM-DD');
+            if (d.isValid()) onDateChange?.(d);
+          }}
+          type="date"
+          value={selectedDate.format('YYYY-MM-DD')}
+        />
       </div>
 
       {/* Inline category picker */}
