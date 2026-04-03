@@ -33,5 +33,7 @@
   "expense.today": "Today",
   "expense.total": "Total",
   "expense.week": "This week",
-  "expense.month": "This month"
+  "expense.month": "This month",
+  "expense.prevMonth": "Previous month",
+  "expense.nextMonth": "Next month"
 }

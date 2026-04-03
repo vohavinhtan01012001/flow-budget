@@ -1,4 +1,71 @@
+.month-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &__chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    padding: 0;
+
+    &:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    &:active {
+      background: var(--accent-medium);
+    }
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent-soft);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    letter-spacing: -0.01em;
+
+    &:hover {
+      background: var(--accent-medium);
+    }
+
+    &:active {
+      background: var(--accent);
+      color: white;
+    }
+  }
+
+  &__caret {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+}
+
 .dashboard-page {
+  &__month-picker-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
   &__summary {
     display: grid;
     grid-template-columns: 1fr 1fr;

@@ -1,8 +1,17 @@
 import dayjs from 'dayjs';
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 import type { TDailyStats } from '@/models/types/expense.type';
 
 import styles from '@/assets/styles/components/expense/dashboard.module.scss';
+import { formatAmountShort } from '@/utils/expense-parser.util';
 
 interface IProps {
   data: TDailyStats[];
@@ -18,72 +27,65 @@ export const ChartLineMonthly: React.FC<IProps> = ({ data }) => {
   }
 
   const maxAmount = Math.max(...data.map((d) => d.amount));
-  const points = data.map((d, i) => {
-    const x = (i / Math.max(data.length - 1, 1)) * 280 + 10;
-    const y =
-      maxAmount > 0
-        ? 100 - (d.amount / maxAmount) * 80
-        : 100;
-    return { x, y };
-  });
 
-  const pathD = points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
-    .join(' ');
-
-  // Area fill path
-  const areaD = `${pathD} L ${points[points.length - 1].x} 110 L ${points[0].x} 110 Z`;
+  const chartData = data.map((d) => ({
+    ...d,
+    label: dayjs(d.date).format('DD'),
+  }));
 
   return (
     <div className={styles['dashboard-page__chart-container']}>
-      <svg
-        className="tw-w-full"
-        preserveAspectRatio="xMidYMid meet"
-        viewBox="0 0 300 130"
-      >
-        <defs>
-          <linearGradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path
-          d={areaD}
-          fill="url(#lineGradient)"
-        />
-        <path
-          d={pathD}
-          fill="none"
-          stroke="#0ea5e9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2.5"
-        />
-        {points.map((p, i) => (
-          <circle
-            cx={p.x}
-            cy={p.y}
-            fill="#030612"
-            key={i}
-            r="4"
-            stroke="#0ea5e9"
-            strokeWidth="2"
+      <ResponsiveContainer height={144} width="100%">
+        <LineChart data={chartData} margin={{ bottom: 0, left: 0, right: 0, top: 8 }}>
+          <XAxis
+            axisLine={false}
+            dataKey="label"
+            interval={Math.floor(data.length / 4)}
+            tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
+            tickLine={false}
           />
-        ))}
-        {data.map((d, i) => (
-          <text
-            fill="var(--text-muted, #94a3b8)"
-            fontSize="8"
-            fontWeight="500"
-            key={i}
-            textAnchor="middle"
-            x={points[i].x}
-            y="125"
-          >
-            {dayjs(d.date).format('DD')}
-          </text>
-        ))}
-      </svg>
+          <YAxis
+            domain={[0, maxAmount * 1.1]}
+            hide
+            tickFormatter={(v) => formatAmountShort(v)}
+          />
+          <Tooltip
+            content={({ active, payload }) => {
+              if (!active || !payload?.length) return null;
+              const item = payload[0].payload as (typeof chartData)[number];
+              return (
+                <div
+                  className="tw-rounded-lg tw-px-3 tw-py-2 tw-text-xs tw-shadow-lg"
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                  }}
+                >
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    {dayjs(item.date).format('DD/MM')}
+                  </span>
+                  <br />
+                  <span className="tw-font-semibold">
+                    {item.amount > 0
+                      ? formatAmountShort(item.amount)
+                      : '—'}
+                  </span>
+                </div>
+              );
+            }}
+            cursor={{ stroke: 'var(--border-color)', strokeWidth: 1 }}
+          />
+          <Line
+            dataKey="amount"
+            dot={false}
+            stroke="#0ea5e9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.5}
+            type="monotone"
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 };

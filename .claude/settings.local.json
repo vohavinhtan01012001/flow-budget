@@ -22,7 +22,16 @@
       "Bash(git config:*)",
       "Bash(git push:*)",
       "Bash(gh auth:*)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "Bash(pnpm --version)",
+      "Bash(git -C /mnt/c/workspace/freelance/flow-budget check-ignore -q .worktrees)",
+      "Bash(git -C /mnt/c/workspace/freelance/flow-budget add .gitignore)",
+      "Bash(git -C:*)",
+      "Bash(grep -r \"PickerStyles\\\\|DatePicker.*styles\" node_modules/antd/es/date-picker/ --include=*.d.ts -l)",
+      "Bash(find /mnt/c/workspace/freelance/flow-budget/node_modules -maxdepth 4 -name package.json -path */rc-picker/package.json)",
+      "Bash(xargs cat:*)",
+      "Bash(pnpm check-all:*)",
+      "WebSearch"
     ]
   }
 }

@@ -33,5 +33,7 @@
   "expense.today": "Hôm nay",
   "expense.total": "Tổng",
   "expense.week": "Tuần này",
-  "expense.month": "Tháng này"
+  "expense.month": "Tháng này",
+  "expense.prevMonth": "Tháng trước",
+  "expense.nextMonth": "Tháng sau"
 }

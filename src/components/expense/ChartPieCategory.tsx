@@ -1,3 +1,11 @@
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts';
+
 import type { TCategoryStats } from '@/models/types/expense.type';
 
 import styles from '@/assets/styles/components/expense/dashboard.module.scss';
@@ -20,6 +28,51 @@ export const ChartPieCategory: React.FC<IProps> = ({ data }) => {
 
   return (
     <div className={styles['dashboard-page__chart-container']}>
+      {/* Donut chart */}
+      <div className="tw-h-44 tw-mb-4">
+        <ResponsiveContainer height="100%" width="100%">
+          <PieChart>
+            <Pie
+              cx="50%"
+              cy="50%"
+              data={data}
+              dataKey="amount"
+              innerRadius={50}
+              nameKey="categoryName"
+              outerRadius={80}
+              paddingAngle={3}
+              stroke="none"
+            >
+              {data.map((item) => (
+                <Cell
+                  fill={item.color ?? '#AEB6BF'}
+                  key={item.categoryId}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              content={({ active, payload }) => {
+                if (!active || !payload?.length) return null;
+                const item = payload[0].payload as TCategoryStats;
+                return (
+                  <div
+                    className="tw-rounded-lg tw-px-3 tw-py-2 tw-text-xs tw-shadow-lg"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                  >
+                    <span style={{ color: 'var(--text-primary)' }}>{item.categoryName}</span>
+                    <br />
+                    <span className="tw-font-semibold tw-text-danger">
+                      {formatVND(item.amount)}
+                    </span>
+                  </div>
+                );
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend list */}
       <div className="tw-space-y-3">
         {data.map((item) => (
           <div className="tw-flex tw-items-center tw-gap-3" key={item.categoryId}>

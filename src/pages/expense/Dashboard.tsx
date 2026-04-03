@@ -6,6 +6,7 @@ import styles from '@/assets/styles/components/expense/dashboard.module.scss';
 import { ChartBarDaily } from '@/components/expense/ChartBarDaily';
 import { ChartLineMonthly } from '@/components/expense/ChartLineMonthly';
 import { ChartPieCategory } from '@/components/expense/ChartPieCategory';
+import { MonthPicker } from '@/components/expense/MonthPicker';
 import { StatsSummary } from '@/components/expense/StatsSummary';
 import { db } from '@/libs/dexie/db';
 import { useAuthStore } from '@/stores/auth.store';
@@ -17,6 +18,7 @@ export const Dashboard: React.FC = () => {
   const categories = useCategoryStore((s) => s.categories);
   const loadCategories = useCategoryStore((s) => s.loadCategories);
 
+  const [selectedMonth, setSelectedMonth] = useState(dayjs());
   const [todayTotal, setTodayTotal] = useState(0);
   const [weekTotal, setWeekTotal] = useState(0);
   const [monthTotal, setMonthTotal] = useState(0);
@@ -34,7 +36,7 @@ export const Dashboard: React.FC = () => {
 
     const today = dayjs().startOf('day');
     const weekStart = dayjs().startOf('week');
-    const monthStart = dayjs().startOf('month');
+    const monthStart = selectedMonth.startOf('month');
 
     // Totals
     const todayExp = allExpenses.filter((e) =>
@@ -44,14 +46,15 @@ export const Dashboard: React.FC = () => {
       dayjs(e.expenseDate).isAfter(weekStart),
     );
     const monthExp = allExpenses.filter((e) =>
-      dayjs(e.expenseDate).isAfter(monthStart),
+      dayjs(e.expenseDate).isAfter(monthStart) &&
+      dayjs(e.expenseDate).isBefore(selectedMonth.endOf('month').add(1, 'day')),
     );
 
     setTodayTotal(todayExp.reduce((s, e) => s + e.amount, 0));
     setWeekTotal(weekExp.reduce((s, e) => s + e.amount, 0));
     setMonthTotal(monthExp.reduce((s, e) => s + e.amount, 0));
 
-    // Category stats (this month)
+    // Category stats (selected month)
     const catMap = new Map<string, number>();
     monthExp.forEach((e) => {
       const key = e.categoryId ?? 'other';
@@ -81,10 +84,11 @@ export const Dashboard: React.FC = () => {
 
     setCategoryStats(stats);
 
-    // Daily stats (last 7 days)
+    // Daily stats — all days in selected month
+    const daysInMonth = selectedMonth.daysInMonth();
     const daily: TDailyStats[] = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = dayjs().subtract(i, 'day');
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = selectedMonth.date(d);
       const dayExp = allExpenses.filter((e) =>
         dayjs(e.expenseDate).isSame(date, 'day'),
       );
@@ -95,18 +99,16 @@ export const Dashboard: React.FC = () => {
     }
     setDailyStats(daily);
 
-    // Monthly trend (last 30 days, grouped by 5-day intervals)
+    // Monthly trend — daily for selected month
     const monthly: TDailyStats[] = [];
-    for (let i = 5; i >= 0; i--) {
-      const start = dayjs().subtract(i * 5, 'day');
-      const end = dayjs().subtract((i - 1) * 5, 'day');
-      const periodExp = allExpenses.filter((e) => {
-        const d = dayjs(e.expenseDate);
-        return d.isAfter(start) && d.isBefore(end);
-      });
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = selectedMonth.date(d);
+      const dayExp = allExpenses.filter((e) =>
+        dayjs(e.expenseDate).isSame(date, 'day'),
+      );
       monthly.push({
-        amount: periodExp.reduce((s, e) => s + e.amount, 0),
-        date: start.toISOString(),
+        amount: dayExp.reduce((s, e) => s + e.amount, 0),
+        date: date.toISOString(),
       });
     }
     setMonthlyStats(monthly);
@@ -120,27 +122,30 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     loadStats();
-  }, [userInfo?.id, categories.length]);
+  }, [userInfo?.id, categories.length, selectedMonth]);
 
   return (
     <div className={styles['dashboard-page']}>
-      <StatsSummary
-        stats={[
-          {
-            label: 'Tháng này',
-            sub: `${dayjs().format('MM/YYYY')}`,
-            value: formatVND(monthTotal),
-          },
-          {
-            label: 'Hôm nay',
-            value: formatVND(todayTotal),
-          },
-          {
-            label: 'Tuần này',
-            value: formatVND(weekTotal),
-          },
-        ]}
-      />
+      <div className={styles['dashboard-page__month-picker-row']}>
+        <MonthPicker onChange={setSelectedMonth} value={selectedMonth} />
+        <StatsSummary
+          stats={[
+            {
+              label: 'Tháng này',
+              sub: selectedMonth.format('MM/YYYY'),
+              value: formatVND(monthTotal),
+            },
+            {
+              label: 'Hôm nay',
+              value: formatVND(todayTotal),
+            },
+            {
+              label: 'Tuần này',
+              value: formatVND(weekTotal),
+            },
+          ]}
+        />
+      </div>
 
       <div className={styles['dashboard-page__section']}>
         <h3>Chi tiêu theo danh mục</h3>
@@ -148,7 +153,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className={styles['dashboard-page__section']}>
-        <h3>7 ngày gần nhất</h3>
+        <h3>{selectedMonth.format('MM/YYYY')}</h3>
         <ChartBarDaily data={dailyStats} />
       </div>
 
