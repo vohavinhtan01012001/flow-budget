@@ -31,7 +31,8 @@
       "Bash(find /mnt/c/workspace/freelance/flow-budget/node_modules -maxdepth 4 -name package.json -path */rc-picker/package.json)",
       "Bash(xargs cat:*)",
       "Bash(pnpm check-all:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git restore:*)"
     ]
   }
 }
