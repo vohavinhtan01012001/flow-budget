@@ -1,4 +1,9 @@
 import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 import type { TCategoryStats, TDailyStats } from '@/models/types/expense.type';
 
@@ -36,15 +41,17 @@ export const Dashboard: React.FC = () => {
 
     const today = dayjs().startOf('day');
     const weekStart = dayjs().startOf('week');
+    const weekEnd = dayjs().endOf('week');
     const monthStart = selectedMonth.startOf('month');
 
     // Totals
     const todayExp = allExpenses.filter((e) =>
       dayjs(e.expenseDate).isSame(today, 'day'),
     );
-    const weekExp = allExpenses.filter((e) =>
-      dayjs(e.expenseDate).isAfter(weekStart),
-    );
+    const weekExp = allExpenses.filter((e) => {
+      const d = dayjs(e.expenseDate);
+      return d.isSameOrAfter(weekStart) && d.isSameOrBefore(weekEnd);
+    });
     const monthExp = allExpenses.filter((e) =>
       dayjs(e.expenseDate).isAfter(monthStart) &&
       dayjs(e.expenseDate).isBefore(selectedMonth.endOf('month').add(1, 'day')),
@@ -122,7 +129,7 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     loadStats();
-  }, [userInfo?.id, categories.length, selectedMonth]);
+  }, [userInfo?.id, categories, selectedMonth]);
 
   return (
     <div className={styles['dashboard-page']}>
